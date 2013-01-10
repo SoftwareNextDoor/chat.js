@@ -47,9 +47,7 @@ App.BoardController = Ember.ArrayController.extend({
 
 var Message = Em.Object.extend({
   body: '',
-  nickname: function(){
-    return App.nickname
-  }.property("App.nickname")
+  nicknameBinding: 'App.nickname'
 })
 
 
