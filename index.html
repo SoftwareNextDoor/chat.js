@@ -19,7 +19,7 @@
   <script type="text/x-handlebars" data-template-name="board">
     <h2>Message Board</h2>
     {{#each msg in content}}
-      <p>{{ msg }}</p>
+      <p>{{ msg.nickname }}: {{ msg.body }}</p>
     {{/each}}
     {{view "App.MessageInputView"}}
   </script>
