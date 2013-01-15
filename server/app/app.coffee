@@ -8,7 +8,7 @@ require("#{__dirname}/../config/boot")(app)
 
 # Configuration
 app.configure ->
-  port = process.env.PORT || 8080
+  port = process.env.PORT || 3030
   if process.argv.indexOf('-p') >= 0
     port = process.argv[process.argv.indexOf('-p') + 1]
 

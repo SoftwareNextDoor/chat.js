@@ -7,6 +7,8 @@
       , "jade": "*"
       , "stylus": "*"
       , "coffee-script": "*"
+      , "socket.io" : "*"
+      , "node-uuid" : "*"
     }
   , "scripts": {
       "start": "server.js"

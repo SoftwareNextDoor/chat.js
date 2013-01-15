@@ -22,4 +22,4 @@ module.exports = (app) ->
     @hooks: ->
       io.sockets.emit 'users.refresh', User.source
 
-  User.source = {}
+  # User.source = {}
