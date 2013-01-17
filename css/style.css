@@ -1,0 +1,18 @@
+#board .feed{
+  height: 200px;
+  float: left;
+  width: 600px;
+}
+
+#board .list{
+  float: left;
+  width: 200px;
+}
+
+#board .input{
+  clear: both;
+}
+
+#board .input input{
+  width: 600px;
+}

@@ -7,6 +7,7 @@
   <script type="text/javascript" src="./js/handlebars-1.0.rc.1.js"></script>
   <script type="text/javascript" src="./js/ember.js"></script>
   <script type="text/javascript" src="./js/chat.js"></script>
+  <link rel="stylesheet" href="./css/style.css" media="screen" type="type/css" />
 </head>
 <body>
 
@@ -18,10 +19,33 @@
 
   <script type="text/x-handlebars" data-template-name="board">
     <h2>Message Board</h2>
-    {{#each msg in content}}
-      <p>{{ msg.nickname }}: {{ msg.body }}</p>
+
+    <div id="board">
+
+      <div class="feed">
+        {{#each msg in content}}
+          <p>{{ msg.nickname }}: {{ msg.body }}</p>
+        {{/each}}
+      </div>
+
+      <div class="list">
+        {{ outlet userlist }}
+      </div>
+
+      <div class="input">
+        {{view "App.MessageInputView" }}
+      </div>
+
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="user-list">
+    <h3>User List</h3>
+    <ul>
+    {{#each user in content}}
+      <li>{{user.nickname}}</li>
     {{/each}}
-    {{view "App.MessageInputView"}}
+    </ul>
   </script>
 
 </body>
