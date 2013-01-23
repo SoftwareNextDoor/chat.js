@@ -1,0 +1,15 @@
+{
+  "name": "chat.js",
+  "description": "Free collaborative web chat",
+  "version": "0.0.1",
+  "private": false,
+  "dependencies": {
+    "express": "3.x",
+    "mocha": "x",
+    "should": "x",
+    "node-uuid": "x",
+    "redis": "x",
+    "cookie": "x",
+    "request": "x"
+  }
+}
