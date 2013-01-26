@@ -1,23 +1,10 @@
 var App = Ember.Application.create()
 
-App.ChatRouterBase = Em.Route.extend({
-  redirect: function(){
-    var nickname = null;
-
-    if (!App.has_nickname())
-      nickname = 'Gallo'
-      while(nickname==='' || nickname===null){
-        nickname = prompt('Pick your nickname');
-      }
-      App.nickname = nickname;
-      this.controllerFor('users').pushObject({nickname: nickname});
-  }
-});
-
-App.IndexRoute = App.ChatRouterBase.extend({
+App.IndexRoute = Em.Route.extend({
   renderTemplate: function(){
     var boardController = this.controllerFor('board');
     var usersController = this.controllerFor('users');
+    var userController = this.controllerFor('user');
 
     this.render('board', {
       controller: boardController,
@@ -29,7 +16,11 @@ App.IndexRoute = App.ChatRouterBase.extend({
       outlet: 'userlist',
       into: 'board'
     });
-
+    
+    $.get('/user', function (response, textStatus) {
+      userController.set('content' , response);
+      usersController.pushObject(userController);
+    }); 
   }
 });
 
@@ -57,18 +48,14 @@ App.BoardController = Ember.ArrayController.extend({
   }
 });
 
+App.UserController = Em.ObjectController.extend({});
+
 App.UsersController = Em.ArrayController.extend({
   content: Em.A()
 });
+
 
 var Message = Em.Object.extend({
   body: '',
   nicknameBinding: 'App.nickname'
 })
-
-
-// helper methods
-
-App.has_nickname = function(){
-  return  App.nickname !== undefined
-}
