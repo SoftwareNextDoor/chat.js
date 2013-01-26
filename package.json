@@ -10,6 +10,7 @@
     "node-uuid": "x",
     "redis": "x",
     "cookie": "x",
+    "jade": "x",
     "request": "x"
   }
 }

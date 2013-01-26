@@ -1,0 +1,36 @@
+!!!
+head
+  script(src='/assets/js/jquery-1.8.3.min.js')
+  script(src='/assets/js/handlebars-1.0.rc.1.js')
+  script(src='/assets/js/ember.js')
+  script(src='/assets/js/chat.js')
+  link(rel='stylesheet', href='/assets/css/style.css', media='screen', type='type/css')
+
+body
+  script(type="text/x-handlebars")
+    h1 Welcome to Chat.js
+    hr
+    {{ outlet board }}
+
+  script(type="text/x-handlebars", data-template-name="board")
+    h2 Message Board
+
+    #board
+      .feed
+        {{#each msg in content}}
+        p {{ msg.nickname }}: {{ msg.body }}
+        {{/each}}
+
+      .list
+        {{ outlet userlist }}
+
+      .input
+        {{view "App.MessageInputView" }}
+
+
+  script(type="text/x-handlebars", data-template-name="user-list")
+    h3 User List
+    ul
+    {{#each user in content}}
+    li {{user.nickname}}
+    {{/each}}

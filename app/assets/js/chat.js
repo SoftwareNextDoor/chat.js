@@ -5,10 +5,10 @@ App.ChatRouterBase = Em.Route.extend({
     var nickname = null;
 
     if (!App.has_nickname())
+      nickname = 'Gallo'
       while(nickname==='' || nickname===null){
         nickname = prompt('Pick your nickname');
       }
-      //nickname = 'Gallo'
       App.nickname = nickname;
       this.controllerFor('users').pushObject({nickname: nickname});
   }
