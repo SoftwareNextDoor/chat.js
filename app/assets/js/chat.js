@@ -54,7 +54,6 @@ App.UsersController = Em.ArrayController.extend({
   content: Em.A()
 });
 
-
 var Message = Em.Object.extend({
   body: '',
   nicknameBinding: 'App.nickname'

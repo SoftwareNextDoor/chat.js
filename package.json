@@ -7,10 +7,12 @@
     "express": "3.x",
     "mocha": "x",
     "should": "x",
-    "node-uuid": "x",
     "redis": "x",
     "cookie": "x",
     "jade": "x",
+    "socket.io": "x",
+    "connect-redis": "x",
+    "supertest": "x",
     "request": "x"
   }
 }
