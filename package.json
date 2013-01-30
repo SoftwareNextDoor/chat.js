@@ -13,6 +13,7 @@
     "socket.io": "x",
     "connect-redis": "x",
     "supertest": "x",
+    "underscore": "x",
     "request": "x"
   }
 }
