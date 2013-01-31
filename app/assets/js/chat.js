@@ -1,4 +1,5 @@
 var App = Ember.Application.create()
+io.connect();
 
 App.IndexRoute = Em.Route.extend({
   renderTemplate: function(){
@@ -16,11 +17,11 @@ App.IndexRoute = Em.Route.extend({
       outlet: 'userlist',
       into: 'board'
     });
-    
-    $.get('/user', function (response, textStatus) {
+
+    $.post('/user', function (response, textStatus, jq) {
       userController.set('content' , response);
       usersController.pushObject(userController);
-    }); 
+    });
   }
 });
 

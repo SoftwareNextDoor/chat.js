@@ -1,9 +1,9 @@
 var express = require('express')
     , app = express()
-    , server = app.listen(3000)
-    , io = require('socket.io').listen(server)
-    , redisStore = require('connect-redis')(express)
+    , httpServer = require('http').createServer(app)
     , chat_session = require('../lib/chat_session');
+
+require('../lib/socket')(httpServer); // socket-io configuration
 
 app.disable('x-powered-by');
 
@@ -20,6 +20,7 @@ app.get('/', function (req, res) {
 });
 
 
+httpServer.listen(3000);
 console.log('Application listening on 3000');
 
 module.exports = app;
