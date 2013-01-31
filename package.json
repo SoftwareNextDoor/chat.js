@@ -3,17 +3,22 @@
   "description": "Free collaborative web chat",
   "version": "0.0.1",
   "private": false,
+  "scripts": {
+    "start": "node app/app.js"
+  },
   "dependencies": {
     "express": "3.x",
-    "mocha": "x",
-    "should": "x",
     "redis": "x",
-    "cookie": "x",
     "jade": "x",
     "socket.io": "x",
     "connect-redis": "x",
+    "underscore": "x"
+  },
+  "devDependencies": {
+    "request": "x",
     "supertest": "x",
-    "underscore": "x",
-    "request": "x"
+    "mocha": "x",
+    "should": "x",
+    "socket.io-client": "x"
   }
 }
