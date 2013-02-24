@@ -1,14 +1,23 @@
-var should = require('should')
-  , app = require('../app/app.js')
-  , ioc = require('socket.io-client')
-  , socket;
+var app = require('../app/app.js')
+  , should = require('should')
+  , io = require('socket.io-client')
+  , host = 'http://localhost:3000'
+  , client
+  ;
 
-before(function () {
-  socket = ioc.connect('http://localhost:3000');
-});
+suite('socket.io client');
 
-test('recognizes socket client js', function (done) {
-  socket.on('setup', function (data) {
+// This tests assume the user is sending the session cookie to authenticate.
+// Socket.io server is using authorization but we dont' know how
+// to test that.
+test('It receives data when connected', function (done) {
+  client = io.connect(host);
+
+  client.on('all_users', function (data) {
+    data.should.be.an.instanceOf(Array);
+  });
+
+  client.on('setup', function (data) {
     data.should.have.keys('nickname');
     done();
   });

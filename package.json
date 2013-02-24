@@ -14,6 +14,7 @@
     "redis": "0.8.x",
     "jade": "0.28.x",
     "socket.io": "0.9.0",
+    "session.socket.io": "0.1.6",
     "connect-redis": "1.4.x",
     "underscore": "1.4.4"
   },
@@ -21,6 +22,8 @@
     "supertest": "0.5.x",
     "mocha": "1.8.x",
     "should": "1.2.x",
+    "phantomjs": "1.8",
+    "mocha-phantomjs": "2.x",
     "socket.io-client": "0.9.0"
   }
 }

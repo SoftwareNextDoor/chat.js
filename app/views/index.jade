@@ -1,37 +1,59 @@
 !!!
 head
   script(src='/assets/js/jquery-1.8.3.min.js')
-  script(src='/assets/js/handlebars-1.0.rc.1.js')
+  script(src='/assets/js/handlebars.js')
   script(src='/assets/js/ember.js')
   script(src='/socket.io/socket.io.js')
   script(src='/assets/js/chat.js')
   link(rel='stylesheet', href='/assets/css/style.css', media='screen', type='type/css')
 
 body
-  script(type="text/x-handlebars")
-    h1 Welcome to Chat.js
-    hr
-    {{ outlet board }}
 
-  script(type="text/x-handlebars", data-template-name="board")
-    h2 Message Board
+  script(type="text/x-handlebars", data-template-name="application")
+    {{render userInfo }}
+    {{render userList }}
 
-    #board
-      .feed
-        {{#each msg in content}}
-        p {{ msg.nickname }}: {{ msg.body }}
-        {{/each}}
-
-      .list
-        {{ outlet userlist }}
-
-      .input
-        {{view "App.MessageInputView" }}
-
-
-  script(type="text/x-handlebars", data-template-name="user-list")
-    h3 User List
-    ul
-    {{#each user in content}}
-    li {{user.nickname}}
+  script(type="text/x-handlebars", data-template-name="userList")
+    {{#each controller}}
+    {{ user.name }}
     {{/each}}
+
+  script(type="text/x-handlebars", data-template-name="userInfo")
+    | {{#view App.UserInfo}}
+    | {{#if user}}
+    |   User Info
+    |   {{#view App.UserInfo}}
+    |     {{#if isEditing}}
+    |       {{view Em.TextField action='register'
+    |                           valueBinding='user.name'
+    |                           placeholder='Nombre'}}
+    |       <a href='#' {{action 'cancel'}}>Cancelar</a>
+    |     {{else}}
+    |       <p>{{ user.name }} <span><a href='#' {{action 'edit'}}>Cambiar</a></span></p>
+    |     {{/if}}
+    |   {{/view}}
+    | {{else}}
+    |   {{view Em.TextField action='register' placeholder='Nombre'}}
+    |   <button {{action "register"}}>Entrar</button>
+    | {{/if}}
+    | {{/view}}
+
+  //-script(type="text/x-handlebars", data-template-name="index")
+    //-p Loading...
+
+  //-script(type="text/x-handlebars", data-template-name="registration")
+    //-h1 Registro
+    //-hr
+    //-h2 Agente de cambio
+    //-{{view Em.TextField valueBinding='nickname' action='register' placeholder='Nombre'}}
+    //-{{#if this.invalid}}
+    //-invalido
+    //-{{/if}}
+    //-| <button {{action "register"}}>Entrar</button>
+
+
+  //-script(type="text/x-handlebars", data-template-name="main")
+    //-h1. Users
+    //-h2. MEssages
+    //-{{ content }}
+    //-{{ nickname }}

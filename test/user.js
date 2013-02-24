@@ -1,9 +1,12 @@
 var should = require('should')
   , User = require('../lib/user.js')
+  , db = require('redis').createClient()
+  , _ = require('underscore')
   , user
   ;
 
 beforeEach(function () {
+  db.flushdb();
   user = new User();
 });
 
@@ -18,7 +21,17 @@ test('It only updates attributes present on the defaultValues keys', function ()
                        , nickname: 'Alan'};
   User.update(user, newAttributes);
 
-  user.should.not.have.key('status');
-  user.should.not.have.key('admin');
+  var nonExistent = _.omit(newAttributes, _.keys(User.defaultValues));
+
+  user.should.not.have.keys(nonExistent);
   user.nickname.should.equal('Alan');
+});
+
+test('Returns all users as Json objects', function (done) {
+  db.set('sess:blahblah', JSON.stringify({test: 'data'}));
+  User.all(function (results) {
+    results.should.be.an.instanceOf(Array);
+    results[0].should.be.an.instanceOf(Object);
+    done();
+  })
 });

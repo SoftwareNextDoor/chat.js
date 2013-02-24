@@ -1,9 +1,14 @@
 var express = require('express')
     , app = express()
     , httpServer = require('http').createServer(app)
-    , chat_session = require('../lib/chat_session');
 
-require('../lib/socket')(httpServer); // socket-io configuration
+    , cookieParser = express.cookieParser('secret')
+    , redisStore = require('connect-redis')(express)
+    , sessionStore = new redisStore()
+    , User = require('../lib/user.js')
+    , _ = require('underscore')
+    ;
+
 
 app.disable('x-powered-by');
 
@@ -11,14 +16,57 @@ app.configure(function(){
   app.engine('.jade', require('jade').__express);
   app.set('views engine', 'jade');
   app.set('views', __dirname + '/views');
+
+  app.use(express.favicon());
   app.use('/assets', express.static(__dirname + '/assets'));
-  app.use(chat_session);
+
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(cookieParser);
+  app.use(express.session({store: sessionStore}));
 });
 
 app.get('/', function (req, res) {
   res.render('index.jade');
 });
 
+
+var io = require('socket.io').listen(httpServer);
+
+var SessionSockets = require('session.socket.io')
+  , sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
+
+var setUserSession = function (session) {
+  if (_(session).isUndefined()) return {}
+  if (_(session.user).isUndefined()) {
+    session.user = new User();
+  }
+  return session.user;
+};
+
+sessionSockets.on('connection', function (err, socket, session) {
+  var user = setUserSession(session);
+
+  socket.emit('user', user);
+
+  User.all(function (users) {
+    socket.emit('userList', users);
+  });
+
+  socket.on('setName', function (name) {
+    session.user['name'] = name
+    session.save();
+    User.all(function (users) {
+      io.sockets.emit('userList', users);
+      socket.emit('user', session.user);
+    });
+  });
+
+  socket.on('getUser', function () {
+    socket.emit('user', user);
+  })
+
+});
 
 httpServer.listen(3000);
 console.log('Application listening on 3000');

@@ -15,12 +15,13 @@ before(function () {
     .use(attachSession);
 });
 
-test('It gives a user session the first time', function (done) {
+test('It gives a session', function (done) {
   request(app)
     .get('/')
     .end(function (error, res) {
       if (error) throw error;
-      res.body.should.have.key('nickname');
+      res.body.should.be.an.instanceOf(Object)
+      res.body.nickname.should.be.a('string');
       done();
     });
 });
