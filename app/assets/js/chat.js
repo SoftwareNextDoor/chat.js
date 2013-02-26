@@ -1,9 +1,33 @@
 var App = Em.Application.create()
-  , socket = io.connect();
+  , socket = io.connect()
+  , logInAudio = new Audio()
+  , messageAudio = new Audio();
+
+logInAudio.src = "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Beeps/Electro_-S_Bainbr-7955/Electro_-S_Bainbr-7955_hifi.mp3"
+logInAudio.autoload = true;
+
+messageAudio.src = "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Blips/Blip_1-Surround-7482/Blip_1-Surround-7482_hifi.mp3"
+messageAudio.autoload = true;
+
+var audioEvents = {
+  login: function () {
+    logInAudio.play();
+  },
+  message: function () {
+    messageAudio.play();
+  }
+}
 
 App.ApplicationRoute = Em.Route.extend({
   setupController: function (controller) {
     var self = this;
+
+    var notify = function (event) {
+      var controller = self.controllerFor('userInfo')
+      if (controller.get('notifications')) {
+        audioEvents[event].call();
+      }
+    };
 
     socket.on('user', function (user) {
       self.controllerFor('userInfo')
@@ -15,10 +39,35 @@ App.ApplicationRoute = Em.Route.extend({
           .set('content', users);
     });
 
+    socket.on('recentMessages', function (messages) {
+      self.controllerFor('messages')
+          .set('content', messages);
+
+    });
+
+    socket.on('newMessage', function (message) {
+      notify('message');
+      self.controllerFor('messages')
+          .addObject(message);
+    });
+
+    socket.on('userJoined', function (message) {
+      notify('login');
+      self.controllerFor('messages')
+          .addObject(message);
+    });
+
   }
 });
 
 App.UserInfoController = Em.Controller.extend({
+
+  notifications: false,
+
+  userObserver: function () {
+    var user = this.get('user');
+    this.set('notifications', user.notifications);
+  }.observes('user'),
 
   register: function (name) {
     if (name!=='') {
@@ -40,137 +89,31 @@ App.UserInfoController = Em.Controller.extend({
 
 });
 
-App.UserInfo = Em.View.extend({
+App.UserInfoView = Em.View.extend({
   focusOut: function (e) {
     this.get('controller')
         .send('cancel');
   }
 });
 
-
-App.UserListController = Em.ArrayController.extend({});
-
-/*var App = Em.Application.create()*/
-  //, socket = io.connect();
-
-
-//socket.on('userInfo', function (session) {
-  //App.session = session;
-//})
-
-//App.Router.map(function () {
-  //this.route('registration');
-  //this.route('main');
-//});
-
-//App.IndexRoute = Em.Route.extend({
-  //setupController: function(controller){
-    //var appController = this.controllerFor('application');
-
-    //// Keep track of user property
-    //appController.addObserver('user', function (user) {
-      //if (user === {} || user['nickname'] === '') {
-        //this.transitionToRoute('registration');
-      //} else {
-        //this.transitionToRoute('main');
-      //}
-    //})
-
-    //socket.on('user', function (userObject) {
-      //appController.set('user', userObject);
-    //});
-
-  //}
-//});
-
-//App.RegistrationRoute = Em.Route.extend({
-  //model: function () {
-    //return this.controllerFor('application').get('user');
-  //}
-//});
-
-//App.RegistrationController = Em.ObjectController.extend({
-
-  //register: function () {
-    //var nickname = this.get('nickname');
-    //if (nickname ==='') {
-      //console.log('isEmpty');
-    //} else {
-      //console.log(nickname);
-      //this.transitionToRoute('main')
-    //}
-  //}
-
-//});
+App.UserInfoView.Notifications = Em.Checkbox.extend({
+  click: function () {
+    socket.emit('setNotifications', this.get('controller').get('notifications'));
+  }
+});
 
 
-//App.MainRoute = Em.Route.extend({
-  //model: function () {
-    //return this.controllerFor('application').get('user');
-  //}
-//});
+App.UserListController = Em.ArrayController.extend({
+  content: Em.A()
+});
 
-//App.MainController = Em.ObjectController.extend({
-/*}*/
 
-//var App = Ember.Application.create()
-  //, socket = io.connect();
+App.MessagesController = Em.ArrayController.extend({
+  content: Em.A(),
+  sendMessage: function (message) {
+    socket.emit('newMessage', message);
+    this.set('message', '');
+  },
 
-//App.IndexRoute = Em.Route.extend({
-  //renderTemplate: function(){
-    //var boardController = this.controllerFor('board');
-    //var usersController = this.controllerFor('users');
-    //var userController = this.controllerFor('user');
-
-    //this.render('board', {
-      //controller: boardController,
-      //outlet: 'board'
-    //});
-
-    //this.render('user-list', {
-      //controller: usersController,
-      //outlet: 'userlist',
-      //into: 'board'
-    //});
-
-    //socket.on('userlist', function (list) {
-      //console.log(list);
-      ////usersController.pushObjects(list);
-      //usersController.set('content', list);
-    //})
-
-  //}
-//});
-
-//App.MessageInputView = Em.TextField.extend({
-  //reset: function(){
-    //this.set('value', '');
-  //},
-
-  //keyUp: function(e){
-    //if ( this.get('value') !== '' && e.keyCode === 13 ){
-      //var msg = Message.create({body: this.get('value')});
-      //this.get('controller').addMessage( msg );
-      //this.reset();
-    //}
-  //}
-//});
-
-//App.BoardController = Ember.ArrayController.extend({
-  //needs: ['users'],
-
-  //content: Em.A(),
-
-  //addMessage: function( msg ){
-    //this.content.pushObject( msg );
-  //}
-//});
-
-//App.UserController = Em.ObjectController.extend({});
-
-//App.UsersController = Em.ArrayController.create();
-
-//var Message = Em.Object.extend({
-  //body: '',
-  //nicknameBinding: 'App.nickname'
-//})
+  message: ''
+});

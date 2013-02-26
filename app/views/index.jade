@@ -12,31 +12,41 @@ body
   script(type="text/x-handlebars", data-template-name="application")
     {{render userInfo }}
     {{render userList }}
+    {{render messages }}
 
   script(type="text/x-handlebars", data-template-name="userList")
-    {{#each controller}}
-    {{ user.name }}
-    {{/each}}
+    ul.
+      {{#each controller}}
+      <li>{{ user.name }}<li>
+      {{/each}}
 
   script(type="text/x-handlebars", data-template-name="userInfo")
-    | {{#view App.UserInfo}}
-    | {{#if user}}
-    |   User Info
-    |   {{#view App.UserInfo}}
-    |     {{#if isEditing}}
+    | {{#view App.UserInfoView}}
+    |   {{#if user}}
+    |     User Info
+    |       {{#if isEditing}}
     |       {{view Em.TextField action='register'
     |                           valueBinding='user.name'
     |                           placeholder='Nombre'}}
     |       <a href='#' {{action 'cancel'}}>Cancelar</a>
-    |     {{else}}
+    |       {{else}}
+    |       <label>
+    |         Recibir Notificaciones
+    |         {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
+    |       </label>
     |       <p>{{ user.name }} <span><a href='#' {{action 'edit'}}>Cambiar</a></span></p>
-    |     {{/if}}
-    |   {{/view}}
-    | {{else}}
-    |   {{view Em.TextField action='register' placeholder='Nombre'}}
-    |   <button {{action "register"}}>Entrar</button>
-    | {{/if}}
+    |       {{/if}}
+    |   {{else}}
+    |     {{view Em.TextField action='register' placeholder='Nombre'}}
+    |     <button {{action "register"}}>Entrar</button>
+    |   {{/if}}
     | {{/view}}
+
+  script(type="text/x-handlebars", data-template-name="messages")
+    {{#each controller}}
+    <p>{{sender}}-{{body}}</p>
+    {{/each}}
+    {{view Em.TextField action='sendMessage' placeholder='Tu Mensaje' valueBinding='message'}}
 
   //-script(type="text/x-handlebars", data-template-name="index")
     //-p Loading...
