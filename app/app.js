@@ -41,19 +41,20 @@ var setUserSession = function (session) {
   if (_(session.user).isUndefined()) {
     session.user = new User();
   }
-  return session.user;
+  session.user.status = 'online'
+  session.save();
 };
 
 sessionSockets.on('connection', function (err, socket, session) {
-  var user = setUserSession(session);
+  setUserSession(session);
 
-  socket.emit('user', user);
+  socket.emit('user', session.user);
   socket.emit('recentMessages', [{sender: 'user', body: 'junaga'}]);
 
-  io.sockets.emit('userJoined', {body: user.name + 'se ha unido al chat. :)'});
+  io.sockets.emit('userJoined', {body: session.user.name + ' se ha unido al chat. :)'});
 
   User.all(function (users) {
-    socket.emit('userList', users);
+    io.sockets.emit('userList', users);
   });
 
   socket.on('setNotifications', function (bool) {
@@ -63,7 +64,7 @@ sessionSockets.on('connection', function (err, socket, session) {
   });
 
   socket.on('setName', function (name) {
-    session.user['name'] = name
+    session.user.name = name
     session.save();
     socket.emit('user', session.user);
     User.all(function (users) {
@@ -72,12 +73,20 @@ sessionSockets.on('connection', function (err, socket, session) {
   });
 
   socket.on('newMessage', function (message) {
-    io.sockets.emit('newMessage', {sender: user.name, body: message});
+    io.sockets.emit('newMessage', {sender: session.user.name, body: message});
   });
 
   socket.on('getUser', function () {
-    socket.emit('user', user);
-  })
+    socket.emit('user', session.user);
+  });
+
+  socket.on('disconnect', function () {
+    session.user.status = 'offline'
+    session.save();
+    User.all(function (users) {
+      io.sockets.emit('userList', users);
+    });
+  });
 
 });
 

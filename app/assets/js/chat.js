@@ -104,9 +104,11 @@ App.UserInfoView.Notifications = Em.Checkbox.extend({
 
 
 App.UserListController = Em.ArrayController.extend({
-  content: Em.A()
+  content: Em.A(),
+  itemController: 'user'
 });
 
+App.UserController = Em.ObjectController.extend({});
 
 App.MessagesController = Em.ArrayController.extend({
   content: Em.A(),

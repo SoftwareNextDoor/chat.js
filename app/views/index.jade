@@ -16,31 +16,27 @@ body
 
   script(type="text/x-handlebars", data-template-name="userList")
     ul.
-      {{#each controller}}
-      <li>{{ user.name }}<li>
+      {{#each user in controller}}
+      <li {{ bindAttr class='status' }}>{{ name }}<li>
       {{/each}}
 
   script(type="text/x-handlebars", data-template-name="userInfo")
-    | {{#view App.UserInfoView}}
-    |   {{#if user}}
-    |     User Info
-    |       {{#if isEditing}}
-    |       {{view Em.TextField action='register'
-    |                           valueBinding='user.name'
-    |                           placeholder='Nombre'}}
-    |       <a href='#' {{action 'cancel'}}>Cancelar</a>
-    |       {{else}}
-    |       <label>
-    |         Recibir Notificaciones
-    |         {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
-    |       </label>
-    |       <p>{{ user.name }} <span><a href='#' {{action 'edit'}}>Cambiar</a></span></p>
-    |       {{/if}}
-    |   {{else}}
-    |     {{view Em.TextField action='register' placeholder='Nombre'}}
-    |     <button {{action "register"}}>Entrar</button>
-    |   {{/if}}
-    | {{/view}}
+    {{#view App.UserInfoView}}
+    h3 User Info
+    label.
+      Recibir Notificaciones
+      {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
+    {{#if isEditing}}
+    p.
+    | {{view Em.TextField action='register'
+    |                    valueBinding='user.name'
+    |                    placeholder='Nombre'}}
+    <a href='#' {{action 'cancel'}}>Cancelar</a>
+    {{else}}
+    p.
+      {{ user.name }} <span><a href='#' {{action 'edit'}}>Cambiar</a></span></p>
+    {{/if}}
+    {{/view}}
 
   script(type="text/x-handlebars", data-template-name="messages")
     {{#each controller}}
