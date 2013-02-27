@@ -1,60 +1,57 @@
 var App = Em.Application.create()
-  , socket = io.connect()
-  , logInAudio = new Audio()
-  , messageAudio = new Audio();
+  , socket = io.connect();
 
-logInAudio.src = "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Beeps/Electro_-S_Bainbr-7955/Electro_-S_Bainbr-7955_hifi.mp3"
-logInAudio.autoload = true;
 
-messageAudio.src = "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Blips/Blip_1-Surround-7482/Blip_1-Surround-7482_hifi.mp3"
-messageAudio.autoload = true;
 
-var audioEvents = {
-  login: function () {
-    logInAudio.play();
-  },
-  message: function () {
-    messageAudio.play();
-  }
+var Notifier = function (router) {
+  var controller = router.controllerFor('userInfo');
+
+  var audioSrc = {
+    login: "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Beeps/Electro_-S_Bainbr-7955/Electro_-S_Bainbr-7955_hifi.mp3"
+    , message: "http://www.flashkit.com/imagesvr_ce/flashkit/soundfx/Interfaces/Blips/Blip_1-Surround-7482/Blip_1-Surround-7482_hifi.mp3"
+  };
+
+  var audios = {};
+
+  function AudioFactory(name) {
+    var audio = audios[name] || (audios[name] = new Audio(audioSrc[name]));
+    audio.play();
+  };
+
+  return function (event) {
+    if (controller.get('notifications')) {
+      AudioFactory(event);
+    }
+  };
 }
+
+
 
 App.ApplicationRoute = Em.Route.extend({
   setupController: function (controller) {
-    var self = this;
-
-    var notify = function (event) {
-      var controller = self.controllerFor('userInfo')
-      if (controller.get('notifications')) {
-        audioEvents[event].call();
-      }
-    };
+    var self = this
+      , notify = new Notifier(self);
 
     socket.on('user', function (user) {
-      self.controllerFor('userInfo')
-          .set('user', user);
+      self.controllerFor('userInfo').set('user', user);
     });
 
     socket.on('userList', function (users) {
-      self.controllerFor('userList')
-          .set('content', users);
+      self.controllerFor('userList').set('content', users);
     });
 
     socket.on('recentMessages', function (messages) {
-      self.controllerFor('messages')
-          .set('content', messages);
-
+      self.controllerFor('messages').set('content', messages);
     });
 
     socket.on('newMessage', function (message) {
       notify('message');
-      self.controllerFor('messages')
-          .addObject(message);
+      self.controllerFor('messages').addObject(message);
     });
 
     socket.on('userJoined', function (message) {
       notify('login');
-      self.controllerFor('messages')
-          .addObject(message);
+      self.controllerFor('messages').addObject(message);
     });
 
   }

@@ -43,23 +43,3 @@ body
     <p>{{sender}}-{{body}}</p>
     {{/each}}
     {{view Em.TextField action='sendMessage' placeholder='Tu Mensaje' valueBinding='message'}}
-
-  //-script(type="text/x-handlebars", data-template-name="index")
-    //-p Loading...
-
-  //-script(type="text/x-handlebars", data-template-name="registration")
-    //-h1 Registro
-    //-hr
-    //-h2 Agente de cambio
-    //-{{view Em.TextField valueBinding='nickname' action='register' placeholder='Nombre'}}
-    //-{{#if this.invalid}}
-    //-invalido
-    //-{{/if}}
-    //-| <button {{action "register"}}>Entrar</button>
-
-
-  //-script(type="text/x-handlebars", data-template-name="main")
-    //-h1. Users
-    //-h2. MEssages
-    //-{{ content }}
-    //-{{ nickname }}
