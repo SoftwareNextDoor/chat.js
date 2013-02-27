@@ -109,10 +109,23 @@ App.UserController = Em.ObjectController.extend({});
 
 App.MessagesController = Em.ArrayController.extend({
   content: Em.A(),
+
+  itemController: 'message',
+
   sendMessage: function (message) {
     socket.emit('newMessage', message);
     this.set('message', '');
   },
 
   message: ''
+});
+
+App.MessageController = Em.ObjectController.extend({
+  formattedTime: function () {
+    var timeString = this.get('time');
+    if (timeString !== undefined) {
+      var time = new Date(timeString);
+      return time.getHours() + ':' + time.getMinutes()
+    } else { return '' }
+  }.property('time')
 });

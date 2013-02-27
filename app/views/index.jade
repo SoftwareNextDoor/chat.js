@@ -39,8 +39,7 @@ body
     {{/view}}
 
   script(type="text/x-handlebars", data-template-name="messages")
-    {{ log controller }}
     {{#each controller}}
-    <p>{{sender}}-{{body}}</p>
+    <p>{{ formattedTime }} {{sender}}-{{body}}</p>
     {{/each}}
     {{view Em.TextField action='sendMessage' placeholder='Tu Mensaje' valueBinding='message'}}

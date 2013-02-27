@@ -6,6 +6,7 @@ var express = require('express')
     , redisStore = require('connect-redis')(express)
     , sessionStore = new redisStore()
     , User = require('../lib/user.js')
+    , Message = require('../lib/message.js').Message
     , redis = require('redis').createClient()
     , _ = require('underscore')
     ;
@@ -51,22 +52,17 @@ sessionSockets.on('connection', function (err, socket, session) {
 
   socket.emit('user', session.user);
 
-  redis.lrange('messages', -5, -1, function (error, reply) {
-    if (!_(reply).isEmpty()) {
-      socket.emit('recentMessages', _(reply).map(function (msg) {
-        return JSON.parse(msg);
-      }));
-    }
+  Message.last(5, function (messages) {
+    socket.emit('recentMessages', messages);
   });
 
-  io.sockets.emit('userJoined', {body: session.user.name + ' se ha unido al chat. :)'});
+  io.sockets.emit('userJoined', new Message(session.user.name, ' ha ingresado.'));
 
   User.all(function (users) {
     io.sockets.emit('userList', users);
   });
 
   socket.on('setNotifications', function (bool) {
-    console.log('changed to: ', bool);
     session.user.notifications = bool;
     session.save();
   });
@@ -81,12 +77,11 @@ sessionSockets.on('connection', function (err, socket, session) {
   });
 
   socket.on('newMessage', function (message) {
-    var msg = {sender: session.user.name, body: message};
-    io.sockets.emit('newMessage', msg);
-
-    var msgString = JSON.stringify(msg);
-    redis.rpush('messages', msgString);
-
+    var msg = new Message(session.user.name, message);
+    msg.save(function (msg){
+      console.log(msg);
+      io.sockets.emit('newMessage', msg);
+    });
   });
 
   socket.on('getUser', function () {
