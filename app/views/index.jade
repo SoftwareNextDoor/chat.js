@@ -17,7 +17,7 @@ body
   script(type="text/x-handlebars", data-template-name="userList")
     ul.
       {{#each user in controller}}
-      <li {{ bindAttr class='status' }}>{{ name }}<li>
+      <li {{ bindAttr class='status' }}>{{ name }}</li>
       {{/each}}
 
   script(type="text/x-handlebars", data-template-name="userInfo")
