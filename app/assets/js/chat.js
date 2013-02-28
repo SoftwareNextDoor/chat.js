@@ -124,8 +124,7 @@ App.MessageController = Em.ObjectController.extend({
   formattedTime: function () {
     var timeString = this.get('time');
     if (timeString !== undefined) {
-      var time = new Date(timeString);
-      return time.getHours() + ':' + time.getMinutes()
+      return new XDate(timeString).toString('HH:mm');
     } else { return '' }
   }.property('time')
 });
