@@ -1,14 +1,16 @@
+// Set db according to environment.
+require('../lib/db_manager.js').configure();
+
 var express = require('express')
     , app = express()
     , httpServer = require('http').createServer(app)
-
     , cookieParser = express.cookieParser('secret')
     , redisStore = require('connect-redis')(express)
     , sessionStore = new redisStore()
-    , User = require('../lib/user.js')
+    ;
+
+var User = require('../lib/user.js')
     , Message = require('../lib/message.js').Message
-    , redis = require('redis').createClient()
-    , _ = require('underscore')
     ;
 
 
@@ -38,17 +40,14 @@ var io = require('socket.io').listen(httpServer);
 var SessionSockets = require('session.socket.io')
   , sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
 
-var setUserSession = function (session) {
-  if (_(session).isUndefined()) return {}
-  if (_(session.user).isUndefined()) {
-    session.user = new User();
-  }
-  session.user.status = 'online'
-  session.save();
-};
 
 sessionSockets.on('connection', function (err, socket, session) {
-  setUserSession(session);
+
+  var user = new User.WithSession(session);
+
+  user.on('ready', function (u) {
+    console.log(u);
+  })
 
   socket.emit('user', session.user);
 

@@ -1,37 +1,32 @@
-//var should = require('should')
-  //, User = require('../lib/user.js')
-  //, db = require('redis').createClient()
-  //, _ = require('underscore')
-  //, user
-  //;
+var dbManager = require('../lib/db_manager.js')
+  , client = dbManager.client
+  , User = require('../lib/user.js')
 
-//beforeEach(function () {
-  //db.flushdb();
-  //user = new User();
-//});
+  , should = require('should')
+  , session = { save: function(){} }
+  ;
 
-//test('It can be represented as a json object', function () {
-  //user.toJson().should.be.a('string');
-  //user.toJson().should.match(/\{.*\}/);
-//});
+dbManager.configure();
 
-//test('It only updates attributes present on the defaultValues keys', function () {
-  //var newAttributes = { status: 'online'
-                       //, admin: true
-                       //, nickname: 'Alan'};
-  //User.update(user, newAttributes);
+suite('User');
 
-  //var nonExistent = _.omit(newAttributes, _.keys(User.defaultValues));
+client.on('ready', function () {
 
-  //user.should.not.have.keys(nonExistent);
-  //user.nickname.should.equal('Alan');
-//});
+  beforeEach(function(){
+    client.flushdb();
+  });
 
-//test('Returns all users as Json objects', function (done) {
-  //db.set('sess:blahblah', JSON.stringify({test: 'data'}));
-  //User.all(function (results) {
-    //results.should.be.an.instanceOf(Array);
-    //results[0].should.be.an.instanceOf(Object);
-    //done();
-  //})
-//});
+  afterEach(function () {
+    client.flushdb();
+  })
+
+  test('.find', function (done) {
+    client.hset('user:4', 'name', 'test', function (error, reply) {
+      User.find(4, function (user) {
+        user.name.should.equal('test');
+        done();
+      });
+    });
+  });
+
+});
