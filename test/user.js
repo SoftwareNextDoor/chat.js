@@ -1,32 +1,74 @@
-var dbManager = require('../lib/db_manager.js')
-  , client = dbManager.client
+var dbConfigurator = require('../lib/db_configurator')
+  , client = dbConfigurator.client
   , User = require('../lib/user.js')
-
   , should = require('should')
   , session = { save: function(){} }
   ;
 
-dbManager.configure();
-
 suite('User');
+
+beforeEach(function(){
+  client.flushdb();
+});
 
 client.on('ready', function () {
 
-  beforeEach(function(){
-    client.flushdb();
+  test('on notFound', function (done) {
+    User.emit('find', 123123123);
+    User.once('notFound', function () {
+      done();
+    });
   });
 
-  afterEach(function () {
-    client.flushdb();
-  })
+  test('on create', function (done) {
+    User.emit('create');
+    User.once('created', function (user) {
+      user.should.be.a('object');
+      user.should.have.ownProperty('name');
+      done();
+    })
+  });
 
-  test('.find', function (done) {
-    client.hset('user:4', 'name', 'test', function (error, reply) {
-      User.find(4, function (user) {
-        user.name.should.equal('test');
+  test('on find', function (done) {
+    User.emit('create');
+
+    User.once('created', function (user) {
+      User.emit('find', user.id);
+    })
+
+    User.once('found', function (user) {
+      user.should.be.a('object');
+      done();
+    });
+  });
+
+  test('on findAll', function(done){
+    User.emit('create');
+    User.once('created', function () {
+      User.emit('create');
+    });
+
+    User.once('created', function () {
+      User.emit('findAll');
+      User.once('foundAll', function (users) {
+        users.should.be.an.instanceOf(Array);
+        users.length.should.be.above(0);
+        users[0].should.have.ownProperty('name');
         done();
       });
     });
+  });
+
+  test('on update', function (done) {
+    User.emit('create');
+    User.once('created', function (user) {
+      user.notifications.should.be.true;
+      User.emit('update', user, { notifications: false });
+      User.once('updated', function (user) {
+        user.notifications.should.be.false;
+        done();
+      });
+    })
   });
 
 });

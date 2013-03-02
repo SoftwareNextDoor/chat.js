@@ -1,12 +1,12 @@
 // Set db according to environment.
-require('../lib/db_manager.js').configure();
+var dbConfigurator = require('../lib/db_configurator.js')
 
 var express = require('express')
     , app = express()
     , httpServer = require('http').createServer(app)
     , cookieParser = express.cookieParser('secret')
     , redisStore = require('connect-redis')(express)
-    , sessionStore = new redisStore()
+    , sessionStore = new redisStore({db: dbConfigurator.selectedDB})
     ;
 
 var User = require('../lib/user.js')
@@ -42,58 +42,62 @@ var SessionSockets = require('session.socket.io')
 
 
 sessionSockets.on('connection', function (err, socket, session) {
+  User.emit('find', session.uid);
 
-  var user = new User.WithSession(session);
-
-  user.on('ready', function (u) {
-    console.log(u);
-  })
-
-  socket.emit('user', session.user);
-
-  Message.last(5, function (messages) {
-    socket.emit('recentMessages', messages);
-  });
-
-  io.sockets.emit('userJoined', new Message(session.user.name, ' ha ingresado.'));
-
-  User.all(function (users) {
-    io.sockets.emit('userList', users);
-  });
-
-  socket.on('setNotifications', function (bool) {
-    session.user.notifications = bool;
+  User.on('notFound', function () { User.emit('create'); })
+  User.on('created', function (user) {
+    session.uid = user.id;
     session.save();
+    User.emit('found', user);
   });
 
-  socket.on('setName', function (name) {
-    session.user.name = name
-    session.save();
-    socket.emit('user', session.user);
-    User.all(function (users) {
+  User.on('found', function (user) {
+    console.log(user);
+
+    socket.emit('user', user);
+    io.sockets.emit('userJoined', new Message(user.name, ' ha ingresado.'));
+
+    socket.on('setNotifications', function (bool) {
+      User.emit('update', user, { notifications: bool });
+    });
+
+    socket.on('setName', function (name) {
+      User.emit('update', user, { name: name });
+    });
+
+    User.on('updated', function (user) {
+      socket.emit('user', user);
+      User.emit('findAll');
+    });
+
+    socket.on('newMessage', function (message) {
+      var msg = new Message(user.name, message);
+      msg.save(function (msg){
+        console.log(msg);
+        io.sockets.emit('newMessage', msg);
+      });
+    });
+
+    Message.last(5, function (messages) {
+      socket.emit('recentMessages', messages);
+    });
+
+    socket.on('getUser', function () {
+      socket.emit('user', user);
+    });
+
+    socket.on('disconnect', function () {
+      User.emit('update', user, {status: 'offline'});
+    });
+
+    User.emit('findAll');
+
+    User.on('foundAll', function (users) {
       io.sockets.emit('userList', users);
     });
   });
 
-  socket.on('newMessage', function (message) {
-    var msg = new Message(session.user.name, message);
-    msg.save(function (msg){
-      console.log(msg);
-      io.sockets.emit('newMessage', msg);
-    });
-  });
-
-  socket.on('getUser', function () {
-    socket.emit('user', session.user);
-  });
-
-  socket.on('disconnect', function () {
-    session.user.status = 'offline'
-    session.save();
-    User.all(function (users) {
-      io.sockets.emit('userList', users);
-    });
-  });
+  User.on('error', function(error){ throw error });
 
 });
 
