@@ -68,7 +68,7 @@ App.UserInfoController = Em.Controller.extend({
 
   register: function (name) {
     if (name!=='') {
-      socket.emit('setName', name);
+      socket.emit('update', {name: name});
       this.set('isEditing', false);
     }
   },
@@ -95,7 +95,8 @@ App.UserInfoView = Em.View.extend({
 
 App.UserInfoView.Notifications = Em.Checkbox.extend({
   click: function () {
-    socket.emit('setNotifications', this.get('controller').get('notifications'));
+    var notifications = this.get('controller').get('notifications');
+    socket.emit('update', { notifications: notifications });
   }
 });
 
