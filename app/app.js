@@ -32,7 +32,7 @@ app.get('/', function (req, res) {
 
 var User = require('../lib/user')
     , UserWithSession = require('../lib/user_with_session')
-    , Message = require('../lib/message').Message
+    , Message = require('../lib/message')
     ;
 
 var io = require('socket.io').listen(httpServer);
@@ -59,17 +59,21 @@ sessionSockets.on('connection', function (err, socket, session) {
       socket.emit('user', user);
     });
 
-    io.sockets.emit('userJoined', new Message(user.name, ' ha ingresado.'));
+    Message.build({sender: user.name, body: ' ha ingresado'}, function (msg) {
+      io.sockets.emit('userJoined', msg);
+    })
 
     socket.on('newMessage', function (message) {
-      var msg = new Message(user.name, message);
-      msg.save(function (msg){
+      Message.create({sender: user.name, body: message}, function (msg) {
         io.sockets.emit('newMessage', msg);
-      });
+      })
     });
 
     socket.on('disconnect', function () {
       user.update({status: 'offline'});
+      Message.build({sender: user.name, body: ' se ha ido.'}, function (msg) {
+        io.sockets.emit('userJoined', msg);
+      })
       User.findAll(function (users) {
         io.sockets.emit('userList', users);
       });
@@ -77,7 +81,7 @@ sessionSockets.on('connection', function (err, socket, session) {
 
   });
 
-  Message.last(5, function (messages) {
+  Message.last(10, function (messages) {
     socket.emit('recentMessages', messages);
   });
 
