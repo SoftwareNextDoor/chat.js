@@ -1,26 +1,98 @@
-#board .feed{
-  height: 200px;
-  float: left;
-  width: 600px;
+@import url(http://fonts.googleapis.com/css?family=Droid+Serif|Oswald|Playfair+Display+SC);
+
+
+body{
+  padding-top: 10px;
 }
 
-#board .list{
-  float: left;
-  width: 200px;
+h1, h2, h3, h4, h5 { font-family: 'Playfair Display SC' }
+
+nav#main li{
+  font-family: 'Oswald';
+  font-weight: 400;
+  font-size: 1.5em;
+  line-height: 1.6em;
+  text-align: center;
 }
 
-#board .input{
-  clear: both;
+nav#main  a{
+  text-decoration: none;
 }
 
-#board .input input{
-  width: 600px;
+/*Messages*/
+
+#messages-feed{
+  max-height: 350px;
+  overflow-y: scroll;
 }
 
-li.online{
+#messages-feed .message,
+#messages-feed .information,
+#messages-feed .body{
+  display: inline-block;
+}
+
+#messages-feed .message{
+  padding-right: 10px;
+}
+
+
+#messages-feed .information{
+  padding-right: 0.5em;
+}
+
+#messages-feed .information p{
+  line-height: 0.9em;
+}
+
+#messages-feed p.time{
+  margin: 0;
+  font-family: Arial;
+  font-size: 0.8em;
+}
+
+#messages-feed p.sender{
+  margin: 0;
+}
+
+#messages-feed p.body{
+  vertical-align: middle;
+  font-family: 'Droid Serif';
+  font-weight: 400;
+  font-size: 1.2em;
+}
+
+/*User List*/
+
+#user-list{
+  max-height: 230px;
+  overflow-y: scroll;
+}
+
+#user-list p span:after{
+  content: ', '
+}
+
+#user-list .online{
   font-weight: bold;
 }
 
-li.offline{
-  font-style: italic;
+@media only screen and (max-width: 767px) {
+  #user-list{
+    border-bottom: 1px dotted #333;
+    margin-bottom: 10px;
+  }
+}
+
+/*User Info*/
+
+#user-info{
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px dotted #333;
+}
+#user-info .username span{
+  padding-left: 10px;
+  margin-left: 10px;
+  border-left: 1px solid #333;
 }

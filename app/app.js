@@ -69,6 +69,10 @@ sessionSockets.on('connection', function (err, socket, session) {
       })
     });
 
+    User.findAll(function (users) {
+      io.sockets.emit('userList', users);
+    });
+
     socket.on('disconnect', function () {
       user.update({status: 'offline'});
       Message.build({sender: user.name, body: ' se ha ido.'}, function (msg) {
@@ -85,9 +89,6 @@ sessionSockets.on('connection', function (err, socket, session) {
     socket.emit('recentMessages', messages);
   });
 
-  User.findAll(function (users) {
-    io.sockets.emit('userList', users);
-  });
 
 });
 

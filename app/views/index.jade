@@ -6,41 +6,77 @@ head
   script(src='/socket.io/socket.io.js')
   script(src='http://arshaw.com/xdate/downloads/0.7/xdate.js')
   script(src='/assets/js/chat.js')
+  link(rel='stylesheet', href='/assets/css/base.css', media='screen', type='type/css')
+  link(rel='stylesheet', href='/assets/css/layout.css', media='screen', type='type/css')
+  link(rel='stylesheet', href='/assets/css/skeleton.css', media='screen', type='type/css')
   link(rel='stylesheet', href='/assets/css/style.css', media='screen', type='type/css')
 
 body
 
+  .container
+    .row
+      img.four.columns.offset-by-five(src='http://laberintoradio.net/assets/laberinto-35ee2ebbc7ed1a5d3bddff2dc371c612.png')
+    nav#main.row
+      ul.sixteen.columns.offset-by-one
+        li.three.columns
+          a(href='#chat') Transmisiones
+        li.three.columns
+          a(href='#chat') Chat
+        li.three.columns
+          a(href='#esucha') Locutores
+        li.three.columns
+          a(href='#mas') Calendario
+
   script(type="text/x-handlebars", data-template-name="application")
-    {{render userInfo }}
-    {{render userList }}
-    {{render messages }}
+    .container.row
+      h1 Chat
+      hr
+      .four.columns
+        {{render userInfo }}
+        {{render userList }}
+      .twelve.columns
+        {{render messages }}
 
   script(type="text/x-handlebars", data-template-name="userList")
-    ul.
-      {{#each user in controller}}
-      <li {{ bindAttr class='status' }}>{{ name }}</li>
-      {{/each}}
+    #user-list
+      h4 Agentes de cambio
+      p
+        {{#each user in controller}}
+        <span {{ bindAttr class='status' }}>{{ name }}</span>
+        {{/each}}
 
   script(type="text/x-handlebars", data-template-name="userInfo")
     {{#view App.UserInfoView}}
-    h3 User Info
-    label.
-      Recibir Notificaciones
-      {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
-    {{#if isEditing}}
-    p.
-    | {{view Em.TextField action='register'
-    |                    valueBinding='user.name'
-    |                    placeholder='Nombre'}}
-    <a href='#' {{action 'cancel'}}>Cancelar</a>
-    {{else}}
-    p.
-      {{ user.name }} <span><a href='#' {{action 'edit'}}>Cambiar</a></span></p>
-    {{/if}}
+    #user-info
+      {{#if isEditing}}
+      p
+      | {{view Em.TextField action='register'
+      |                    valueBinding='user.name'
+      |                    placeholder='Nombre'}}
+      <a href='#' {{action 'cancel'}}>Cancelar</a>
+      {{else}}
+      p.username
+        {{ user.name }}
+        span
+          <a href='#' {{action 'edit'}}>Cambiar</a></span>
+      {{/if}}
+      label.
+        Audio Notificaciones
+        {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
     {{/view}}
 
   script(type="text/x-handlebars", data-template-name="messages")
-    {{#each controller}}
-    <p>{{ formattedTime }} {{sender}}-{{body}}</p>
-    {{/each}}
-    {{view Em.TextField action='sendMessage' placeholder='Tu Mensaje' valueBinding='message'}}
+    #messages-feed
+      {{#each controller}}
+      <div class='message'>
+      <div class='information'>
+      <p class='sender'>{{ sender }}</p>
+      <p class='time'>{{ formattedTime }}</p>
+      </div>
+      <p class='body'>{{body}}</p>
+      </div>
+      {{/each}}
+    | {{view Em.TextField action='sendMessage'
+    |                     placeholder='Tu Mensaje'
+    |                     valueBinding='message'
+    |                     class='eleven columns alpha omega'}}
