@@ -61,12 +61,12 @@ sessionSockets.on('connection', function (err, socket, session) {
 
     Message.build({sender: user.name, body: ' ha ingresado'}, function (msg) {
       io.sockets.emit('userJoined', msg);
-    })
+    });
 
     socket.on('newMessage', function (message) {
       Message.create({sender: user.name, body: message}, function (msg) {
         io.sockets.emit('newMessage', msg);
-      })
+      });
     });
 
     User.findAll(function (users) {

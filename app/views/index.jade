@@ -5,6 +5,8 @@ head
   script(src='/assets/js/ember.js')
   script(src='/socket.io/socket.io.js')
   script(src='http://arshaw.com/xdate/downloads/0.7/xdate.js')
+  script(src='/assets/js/sm/soundmanager2.js')
+  script(src='/assets/js/player.js')
   script(src='/assets/js/chat.js')
   link(rel='stylesheet', href='/assets/css/base.css', media='screen', type='type/css')
   link(rel='stylesheet', href='/assets/css/layout.css', media='screen', type='type/css')
@@ -15,68 +17,72 @@ body
 
   .container
     .row
-      img.four.columns.offset-by-five(src='http://laberintoradio.net/assets/laberinto-35ee2ebbc7ed1a5d3bddff2dc371c612.png')
+      img.three.columns.offset-by-six(src='http://laberintoradio.net/assets/laberinto-35ee2ebbc7ed1a5d3bddff2dc371c612.png')
     nav#main.row
-      ul.sixteen.columns.offset-by-one
+      ul.sixteen.columns.offset-by-four
         li.three.columns
-          a(href='#chat') Transmisiones
+          a(href='#transmision') Transmisi&oacute;n
         li.three.columns
           a(href='#chat') Chat
-        li.three.columns
-          a(href='#esucha') Locutores
-        li.three.columns
-          a(href='#mas') Calendario
+        //-li.three.columns
+          //-a(href='#locutores') Locutores
+        //-li.three.columns
+          //-a(href='#calendario') Calendario
 
-  script(type="text/x-handlebars", data-template-name="application")
-    .container.row
-      h1 Chat
-      hr
-      .four.columns
-        {{render userInfo }}
-        {{render userList }}
-      .twelve.columns
-        {{render messages }}
+  .container.row#transmision
+    h1 Transmisi&oacute;n
+    button.listen Escuchar
+    p
+      a(href='http://tunein.com/radio/Laberinto-Radio-s140279/', target='_blank') No sirve el boton :\
 
-  script(type="text/x-handlebars", data-template-name="userList")
-    #user-list
-      h4 Agentes de cambio
-      p
-        {{#each user in controller}}
-        <span {{ bindAttr class='status' }}>{{ name }}</span>
+  #chat
+    script(type="text/x-handlebars", data-template-name="application")
+      .container.row
+        h1 Chat
+        .four.columns
+          {{render userInfo }}
+          {{render userList }}
+        .twelve.columns.omega
+          {{render messages }}
+
+    script(type="text/x-handlebars", data-template-name="userList")
+      #user-list
+        h4 Agentes de cambio
+        p
+          {{#each user in controller}}
+          <span {{ bindAttr class='status' }}>{{ name }}</span>
+          {{/each}}
+
+    script(type="text/x-handlebars", data-template-name="userInfo")
+      {{#view App.UserInfoView}}
+      h4 Perfil
+      #user-info
+        {{#if isEditing}}
+        p
+        | {{view Em.TextField action='register'
+        |                    valueBinding='user.name'
+        |                    placeholder='Nombre'}}
+        <a href='#' {{action 'cancel'}}>Cancelar</a>
+        {{else}}
+        <a href='#' title='Cambiar' {{action 'edit'}}>{{ user.name }}</a></span>
+        {{/if}}
+        label.
+          Audio Notificaciones
+          {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
+      {{/view}}
+
+    script(type="text/x-handlebars", data-template-name="messages")
+      #messages-feed
+        {{#each controller}}
+        <div class='message'>
+        <div class='information'>
+        <p class='sender'>{{ sender }}</p>
+        <p class='time'>{{ formattedTime }}</p>
+        </div>
+        <p class='body'>{{body}}</p>
+        </div>
         {{/each}}
-
-  script(type="text/x-handlebars", data-template-name="userInfo")
-    {{#view App.UserInfoView}}
-    #user-info
-      {{#if isEditing}}
-      p
-      | {{view Em.TextField action='register'
-      |                    valueBinding='user.name'
-      |                    placeholder='Nombre'}}
-      <a href='#' {{action 'cancel'}}>Cancelar</a>
-      {{else}}
-      p.username
-        {{ user.name }}
-        span
-          <a href='#' {{action 'edit'}}>Cambiar</a></span>
-      {{/if}}
-      label.
-        Audio Notificaciones
-        {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
-    {{/view}}
-
-  script(type="text/x-handlebars", data-template-name="messages")
-    #messages-feed
-      {{#each controller}}
-      <div class='message'>
-      <div class='information'>
-      <p class='sender'>{{ sender }}</p>
-      <p class='time'>{{ formattedTime }}</p>
-      </div>
-      <p class='body'>{{body}}</p>
-      </div>
-      {{/each}}
-    | {{view Em.TextField action='sendMessage'
-    |                     placeholder='Tu Mensaje'
-    |                     valueBinding='message'
-    |                     class='eleven columns alpha omega'}}
+      | {{view Em.TextField action='sendMessage'
+      |                     placeholder='Tu Mensaje'
+      |                     valueBinding='message'
+      |                     class='eleven columns alpha omega'}}

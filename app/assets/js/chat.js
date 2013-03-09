@@ -1,8 +1,6 @@
 var App = Em.Application.create()
   , socket = io.connect();
 
-
-
 var Notifier = function (router) {
   var controller = router.controllerFor('userInfo');
 
@@ -25,7 +23,9 @@ var Notifier = function (router) {
   };
 }
 
-
+App.Router.reopen({
+  location: 'none'
+});
 
 App.ApplicationRoute = Em.Route.extend({
   setupController: function (controller) {
@@ -47,6 +47,9 @@ App.ApplicationRoute = Em.Route.extend({
     socket.on('newMessage', function (message) {
       notify('message');
       self.controllerFor('messages').addObject(message);
+      Ember.run.later(function () {
+        $('#messages-feed').scrollTop($('#messages-feed')[0].scrollHeight);
+      },100);
     });
 
     socket.on('userJoined', function (message) {
@@ -103,6 +106,8 @@ App.UserInfoView.Notifications = Em.Checkbox.extend({
 
 App.UserListController = Em.ArrayController.extend({
   content: Em.A(),
+  sortProperties: ['status', 'name'],
+  sortAscending: false,
   itemController: 'user'
 });
 
@@ -128,4 +133,7 @@ App.MessageController = Em.ObjectController.extend({
       return new XDate(timeString).toString('HH:mm');
     } else { return '' }
   }.property('time')
+});
+
+App.MessagesView = Em.View.extend({
 });

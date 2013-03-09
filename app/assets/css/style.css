@@ -1,11 +1,15 @@
 @import url(http://fonts.googleapis.com/css?family=Droid+Serif|Oswald|Playfair+Display+SC);
 
-
 body{
   padding-top: 10px;
 }
 
 h1, h2, h3, h4, h5 { font-family: 'Playfair Display SC' }
+h1{
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
 
 nav#main li{
   font-family: 'Oswald';
@@ -26,7 +30,6 @@ nav#main  a{
   overflow-y: scroll;
 }
 
-#messages-feed .message,
 #messages-feed .information,
 #messages-feed .body{
   display: inline-block;
@@ -53,13 +56,14 @@ nav#main  a{
 
 #messages-feed p.sender{
   margin: 0;
+  font-weight: bold;
 }
 
 #messages-feed p.body{
   vertical-align: middle;
   font-family: 'Droid Serif';
   font-weight: 400;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 
 /*User List*/
