@@ -47,7 +47,7 @@ body
 
     script(type="text/x-handlebars", data-template-name="userList")
       #user-list
-        h4 Agentes de cambio
+        h4 Usuarios
         p
           {{#each user in controller}}
           <span {{ bindAttr class='status' }}>{{ name }}</span>
@@ -55,20 +55,21 @@ body
 
     script(type="text/x-handlebars", data-template-name="userInfo")
       {{#view App.UserInfoView}}
-      h4 Perfil
       #user-info
         {{#if isEditing}}
-        p
         | {{view Em.TextField action='register'
         |                    valueBinding='user.name'
         |                    placeholder='Nombre'}}
-        <a href='#' {{action 'cancel'}}>Cancelar</a>
         {{else}}
-        <a href='#' title='Cambiar' {{action 'edit'}}>{{ user.name }}</a></span>
+        h4
+          <a href='#' title='Cambiar' class='icon' {{action 'edit'}}>
+          {{ user.name }}
+          <span class='pencil'></span>
+          </a>
         {{/if}}
         label.
-          Audio Notificaciones
           {{view App.UserInfoView.Notifications checkedBinding='notifications' }}
+          Notificaciones
       {{/view}}
 
     script(type="text/x-handlebars", data-template-name="messages")

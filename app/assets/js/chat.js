@@ -21,7 +21,13 @@ var Notifier = function (router) {
       AudioFactory(event);
     }
   };
-}
+};
+
+var scrollMessages = function () {
+  Ember.run.later(function () {
+    $('#messages-feed').animate({scrollTop: $('#messages-feed')[0].scrollHeight});
+  }, 100);
+};
 
 App.Router.reopen({
   location: 'none'
@@ -32,11 +38,11 @@ App.ApplicationRoute = Em.Route.extend({
     var self = this
       , notify = new Notifier(self);
 
-    socket.on('user', function (user) {
+    socket.on('user:online', function (user) {
       self.controllerFor('userInfo').set('user', user);
     });
 
-    socket.on('userList', function (users) {
+    socket.on('user:all', function (users) {
       self.controllerFor('userList').set('content', users);
     });
 
@@ -52,17 +58,13 @@ App.ApplicationRoute = Em.Route.extend({
 
     socket.on('recentMessages', function (messages) {
       self.controllerFor('messages').set('content', messages);
-      Ember.run.later(function () {
-        $('#messages-feed').animate({scrollTop: $('#messages-feed')[0].scrollHeight});
-      }, 100);
+      scrollMessages();
     });
 
-    socket.on('newMessage', function (message) {
-      notify('message');
+    socket.on('message', function (message) {
       self.controllerFor('messages').addObject(message);
-      Ember.run.later(function () {
-        $('#messages-feed').animate({scrollTop: $('#messages-feed')[0].scrollHeight});
-      }, 100);
+      notify('message');
+      scrollMessages();
     });
 
     socket.on('userJoined', function (message) {
@@ -95,17 +97,11 @@ App.UserInfoController = Em.Controller.extend({
     this.set('isEditing', true);
   },
 
-  cancel: function () {
-    socket.emit('getUser');
-    this.set('isEditing', false);
-  }
-
 });
 
 App.UserInfoView = Em.View.extend({
-  focusOut: function (e) {
-    this.get('controller')
-        .send('cancel');
+  focusOut: function () {
+    this.get('controller').send('register');
   }
 });
 
@@ -132,7 +128,7 @@ App.MessagesController = Em.ArrayController.extend({
   itemController: 'message',
 
   sendMessage: function (message) {
-    socket.emit('newMessage', message);
+    socket.emit('message', message);
     this.set('message', '');
   },
 

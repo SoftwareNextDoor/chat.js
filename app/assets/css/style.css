@@ -100,3 +100,15 @@ nav#main  a{
   margin-left: 10px;
   border-left: 1px solid #333;
 }
+
+/* Icons */
+
+.icon span{
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+.icon:hover .pencil{
+  background-image: url(/assets/img/pencil.png);
+}

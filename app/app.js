@@ -46,29 +46,25 @@ sessionSockets.on('connection', function (err, socket, session) {
   UserWithSession.find(session, function (user) {
     user.online();
 
-    socket.emit('user', user);
+    socket.emit('user:online', user);
 
     socket.on('update', function (attributes) {
       user.update(attributes);
       io.sockets.emit('listChanged', user);
     });
 
-    socket.on('getUser', function () {
-      socket.emit('user', user);
-    });
-
     Message.build({sender: user.name, body: ' ha ingresado'}, function (msg) {
       socket.broadcast.emit('userJoined', msg);
     });
 
-    socket.on('newMessage', function (message) {
+    socket.on('message', function (message) {
       Message.create({sender: user.name, body: message}, function (msg) {
-        io.sockets.emit('newMessage', msg);
+        io.sockets.emit('message', msg);
       });
     });
 
     User.findAll(function (users) {
-      io.sockets.emit('userList', users);
+      io.sockets.emit('user:all', users);
     });
 
     socket.on('disconnect', function () {
