@@ -40,16 +40,29 @@ App.ApplicationRoute = Em.Route.extend({
       self.controllerFor('userList').set('content', users);
     });
 
+    socket.on('listChanged', function (user) {
+      var controller = self.controllerFor('userList')
+        , oldUser;
+      oldUser = controller.content.find(function (obj) {
+        return obj.id === user.id;
+      });
+      controller.content.removeObject(oldUser);
+      controller.addObject(user);
+    });
+
     socket.on('recentMessages', function (messages) {
       self.controllerFor('messages').set('content', messages);
+      Ember.run.later(function () {
+        $('#messages-feed').animate({scrollTop: $('#messages-feed')[0].scrollHeight});
+      }, 100);
     });
 
     socket.on('newMessage', function (message) {
       notify('message');
       self.controllerFor('messages').addObject(message);
       Ember.run.later(function () {
-        $('#messages-feed').scrollTop($('#messages-feed')[0].scrollHeight);
-      },100);
+        $('#messages-feed').animate({scrollTop: $('#messages-feed')[0].scrollHeight});
+      }, 100);
     });
 
     socket.on('userJoined', function (message) {

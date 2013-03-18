@@ -23,6 +23,6 @@
     "supertest": "0.5.x",
     "mocha": "1.8.x",
     "should": "1.2.x",
-    "socket.io-client": "0.9.11"
+    "socket.io-client": "0.9.0"
   }
 }

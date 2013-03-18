@@ -44,15 +44,13 @@ var SessionSockets = require('session.socket.io')
 sessionSockets.on('connection', function (err, socket, session) {
 
   UserWithSession.find(session, function (user) {
-    user.update({status: 'online'});
+    user.online();
 
     socket.emit('user', user);
 
     socket.on('update', function (attributes) {
       user.update(attributes);
-      User.findAll(function (users) {
-        io.sockets.emit('userList', users);
-      });
+      io.sockets.emit('listChanged', user);
     });
 
     socket.on('getUser', function () {
@@ -60,7 +58,7 @@ sessionSockets.on('connection', function (err, socket, session) {
     });
 
     Message.build({sender: user.name, body: ' ha ingresado'}, function (msg) {
-      io.sockets.emit('userJoined', msg);
+      socket.broadcast.emit('userJoined', msg);
     });
 
     socket.on('newMessage', function (message) {
@@ -76,11 +74,9 @@ sessionSockets.on('connection', function (err, socket, session) {
     socket.on('disconnect', function () {
       user.update({status: 'offline'});
       Message.build({sender: user.name, body: ' se ha ido.'}, function (msg) {
-        io.sockets.emit('userJoined', msg);
-      })
-      User.findAll(function (users) {
-        io.sockets.emit('userList', users);
+        socket.broadcast.emit('userJoined', msg);
       });
+      io.sockets.emit('listChanged', user);
     });
 
   });
