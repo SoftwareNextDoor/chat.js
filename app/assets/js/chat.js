@@ -39,7 +39,7 @@ App.ApplicationRoute = Em.Route.extend({
       , notify = new Notifier(self);
 
     socket.on('user:online', function (user) {
-      self.controllerFor('userInfo').set('user', user);
+      self.controllerFor('userInfo').set('content', user);
     });
 
     socket.on('user:all', function (users) {
@@ -56,12 +56,12 @@ App.ApplicationRoute = Em.Route.extend({
       controller.addObject(user);
     });
 
-    socket.on('recentMessages', function (messages) {
+    socket.on('message:recent', function (messages) {
       self.controllerFor('messages').set('content', messages);
       scrollMessages();
     });
 
-    socket.on('message', function (message) {
+    socket.on('message:new', function (message) {
       self.controllerFor('messages').addObject(message);
       notify('message');
       scrollMessages();
@@ -75,18 +75,11 @@ App.ApplicationRoute = Em.Route.extend({
   }
 });
 
-App.UserInfoController = Em.Controller.extend({
-
-  notifications: false,
-
-  userObserver: function () {
-    var user = this.get('user');
-    this.set('notifications', user.notifications);
-  }.observes('user'),
+App.UserInfoController = Em.ObjectController.extend({
 
   register: function (name) {
     if (name!=='') {
-      socket.emit('update', {name: name});
+      socket.emit('user:update', {name: name});
       this.set('isEditing', false);
     }
   },
@@ -95,7 +88,7 @@ App.UserInfoController = Em.Controller.extend({
 
   edit: function () {
     this.set('isEditing', true);
-  },
+  }
 
 });
 
@@ -108,7 +101,7 @@ App.UserInfoView = Em.View.extend({
 App.UserInfoView.Notifications = Em.Checkbox.extend({
   click: function () {
     var notifications = this.get('controller').get('notifications');
-    socket.emit('update', { notifications: notifications });
+    socket.emit('user:update', { notifications: notifications });
   }
 });
 
@@ -128,7 +121,7 @@ App.MessagesController = Em.ArrayController.extend({
   itemController: 'message',
 
   sendMessage: function (message) {
-    socket.emit('message', message);
+    socket.emit('message:new', message);
     this.set('message', '');
   },
 

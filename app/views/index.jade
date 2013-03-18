@@ -58,12 +58,12 @@ body
       #user-info
         {{#if isEditing}}
         | {{view Em.TextField action='register'
-        |                    valueBinding='user.name'
+        |                    valueBinding='name'
         |                    placeholder='Nombre'}}
         {{else}}
         h4
           <a href='#' title='Cambiar' class='icon' {{action 'edit'}}>
-          {{ user.name }}
+          {{ name }}
           <span class='pencil'></span>
           </a>
         {{/if}}

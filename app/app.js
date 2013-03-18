@@ -48,7 +48,7 @@ sessionSockets.on('connection', function (err, socket, session) {
 
     socket.emit('user:online', user);
 
-    socket.on('update', function (attributes) {
+    socket.on('user:update', function (attributes) {
       user.update(attributes);
       io.sockets.emit('listChanged', user);
     });
@@ -57,9 +57,9 @@ sessionSockets.on('connection', function (err, socket, session) {
       socket.broadcast.emit('userJoined', msg);
     });
 
-    socket.on('message', function (message) {
+    socket.on('message:new', function (message) {
       Message.create({sender: user.name, body: message}, function (msg) {
-        io.sockets.emit('message', msg);
+        io.sockets.emit('message:new', msg);
       });
     });
 
@@ -78,7 +78,7 @@ sessionSockets.on('connection', function (err, socket, session) {
   });
 
   Message.last(10, function (messages) {
-    socket.emit('recentMessages', messages);
+    socket.emit('message:recent', messages);
   });
 
 
