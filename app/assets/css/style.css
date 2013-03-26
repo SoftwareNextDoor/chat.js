@@ -24,6 +24,12 @@ nav#main  a{
   text-decoration: none;
 }
 
+img#laberinto{
+  width: 25%;
+  display: block;
+  margin: 0 auto;
+}
+
 /*Messages*/
 
 #messages-feed{
@@ -112,4 +118,30 @@ nav#main  a{
 
 .icon:hover .pencil{
   background-image: url(/assets/img/pencil.png);
+}
+
+
+/* Player */
+#transmision{
+  width: 50%;
+  text-align: center;
+}
+
+#transmision .listen{
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  display: block;
+}
+
+#transmision .listen:hover{
+  cursor: pointer;
+}
+
+#transmision .listen.play{
+  background: url('http://icons.iconarchive.com/icons/gakuseisean/ivista/64/Play-icon.png') no-repeat top left;
+}
+
+#transmision .listen.pause{
+  background: url('http://icons.iconarchive.com/icons/gakuseisean/ivista/64/Pause-icon.png') no-repeat top left;
 }

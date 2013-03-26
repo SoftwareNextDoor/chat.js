@@ -17,12 +17,12 @@ body
 
   .container
     .row
-      img.three.columns.offset-by-six(src='http://laberintoradio.net/assets/laberinto-35ee2ebbc7ed1a5d3bddff2dc371c612.png')
+      img#laberinto(src='http://laberintoradio.net/assets/laberinto-35ee2ebbc7ed1a5d3bddff2dc371c612.png')
 
   .container.row#transmision
-    button.listen Escuchar
+    a.listen.play
     p
-      a(href='http://tunein.com/radio/Laberinto-Radio-s140279/', target='_blank') No sirve el boton :\
+      a(href='http://tunein.com/radio/Laberinto-Radio-s140279/', target='_blank') No sirve el boton
 
   #chat
     script(type="text/x-handlebars", data-template-name="application")

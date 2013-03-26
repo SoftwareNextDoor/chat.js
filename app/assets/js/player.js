@@ -22,9 +22,15 @@ $(function(){
   $('.listen').toggle(function (e) {
     e.preventDefault();
     audio.play();
+    $('.listen').
+      removeClass('play').
+      addClass('pause')
   }, function (e) {
     e.preventDefault();
     audio.pause();
+    $('.listen').
+      removeClass('pause').
+      addClass('play')
   });
 
 });
