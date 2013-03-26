@@ -46,7 +46,7 @@ App.ApplicationRoute = Em.Route.extend({
       self.controllerFor('userList').set('content', users);
     });
 
-    socket.on('listChanged', function (user) {
+    socket.on('users:change', function (user) {
       var controller = self.controllerFor('userList')
         , oldUser;
       oldUser = controller.content.find(function (obj) {
@@ -67,7 +67,7 @@ App.ApplicationRoute = Em.Route.extend({
       scrollMessages();
     });
 
-    socket.on('userJoined', function (message) {
+    socket.on('message:notice', function (message) {
       notify('login');
       self.controllerFor('messages').addObject(message);
     });
@@ -94,7 +94,7 @@ App.UserInfoController = Em.ObjectController.extend({
 
 App.UserInfoView = Em.View.extend({
   focusOut: function () {
-    this.get('controller').send('register');
+    //this.get('controller').send('register');
   }
 });
 
@@ -132,7 +132,8 @@ App.MessageController = Em.ObjectController.extend({
   formattedTime: function () {
     var timeString = this.get('time');
     if (timeString !== undefined) {
-      return new XDate(timeString).toString('HH:mm');
+      //return new XDate(timeString).toString('HH:mm');
+      return new Date(timeString).toString('HH:mm');
     } else { return '' }
   }.property('time')
 });

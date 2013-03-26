@@ -22,7 +22,10 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(cookieParser);
-  app.use(express.session({store: sessionStore}));
+  app.use(express.session({ store: sessionStore,
+                            cookie: { maxAge: 24 * 14 * 60 * 60 * 1000 }
+                          })
+         );
 });
 
 app.get('/', function (req, res) {
@@ -30,58 +33,37 @@ app.get('/', function (req, res) {
 });
 
 
-var User = require('../lib/user')
-    , UserWithSession = require('../lib/user_with_session')
+var io = require('socket.io').listen(httpServer)
     , Message = require('../lib/message')
+    , User = require('../lib/user')
+    , Messenger = require('../lib/messenger')(io)
+    , SessionSockets = require('session.socket.io')
+    , sessionSockets = new SessionSockets(io, sessionStore, cookieParser)
     ;
-
-var io = require('socket.io').listen(httpServer);
-
-var SessionSockets = require('session.socket.io')
-  , sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
 
 
 sessionSockets.on('connection', function (err, socket, session) {
 
-  UserWithSession.find(session, function (user) {
-    user.online();
-
-    socket.emit('user:online', user);
+  User.findWithSession(session, function (user) {
+    Messenger.connect(user, socket);
 
     socket.on('user:update', function (attributes) {
+      if (attributes.hasOwnProperty('name')) {
+        io.sockets.emit('users:change', user);
+        Messenger.notice(socket, user.name + ' ahora se llama ' + attributes.name);
+      }
       user.update(attributes);
-      io.sockets.emit('listChanged', user);
-    });
-
-    Message.build({sender: user.name, body: ' ha ingresado'}, function (msg) {
-      socket.broadcast.emit('userJoined', msg);
     });
 
     socket.on('message:new', function (message) {
-      Message.create({sender: user.name, body: message}, function (msg) {
-        io.sockets.emit('message:new', msg);
-      });
-    });
-
-    User.findAll(function (users) {
-      io.sockets.emit('user:all', users);
+      Messenger.talk(user, message);
     });
 
     socket.on('disconnect', function () {
-      user.update({status: 'offline'});
-      Message.build({sender: user.name, body: ' se ha ido.'}, function (msg) {
-        socket.broadcast.emit('userJoined', msg);
-      });
-      io.sockets.emit('listChanged', user);
+      Messenger.disconnect(user, socket);
     });
 
   });
-
-  Message.last(10, function (messages) {
-    socket.emit('message:recent', messages);
-  });
-
-
 });
 
 httpServer.listen(3000);
